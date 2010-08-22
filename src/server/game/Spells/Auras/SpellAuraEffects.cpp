@@ -1272,8 +1272,10 @@ void AuraEffect::PeriodicTick(Unit * target, Unit * caster) const
             {
                 damage = caster->SpellDamageBonus(target, GetSpellProto(), damage, DOT, GetBase()->GetStackAmount());
 
-                // Calculate armor mitigation
-                if (Unit::IsDamageReducedByArmor(GetSpellSchoolMask(GetSpellProto()), GetSpellProto(), m_effIndex))
+                // Calculate armor mitigation if it is a physical spell
+                // But not for bleed mechanic spells
+                if (GetSpellSchoolMask(GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL &&
+                     GetEffectMechanic(GetSpellProto(), m_effIndex) != MECHANIC_BLEED)
                 {
                     uint32 damageReductedArmor = caster->CalcArmorReducedDamage(target, damage, GetSpellProto());
                     cleanDamage.mitigated_damage += damage - damageReductedArmor;
@@ -1383,8 +1385,8 @@ void AuraEffect::PeriodicTick(Unit * target, Unit * caster) const
             if (crit)
                 damage = caster->SpellCriticalDamageBonus(m_spellProto, damage, target);
 
-            // Calculate armor mitigation
-            if (Unit::IsDamageReducedByArmor(GetSpellSchoolMask(GetSpellProto()), GetSpellProto(), m_effIndex))
+            //Calculate armor mitigation if it is a physical spell
+            if (GetSpellSchoolMask(GetSpellProto()) & SPELL_SCHOOL_MASK_NORMAL)
             {
                 uint32 damageReductedArmor = caster->CalcArmorReducedDamage(target, damage, GetSpellProto());
                 cleanDamage.mitigated_damage += damage - damageReductedArmor;
@@ -1986,8 +1988,8 @@ void AuraEffect::PeriodicDummyTick(Unit * target, Unit * caster) const
                 }
                 // Overkill
                 case 58428:
-                    if (!target->HasAuraType(SPELL_AURA_MOD_STEALTH))
-                        target->RemoveAurasDueToSpell(58427);
+                    if (!caster->HasAuraType(SPELL_AURA_MOD_STEALTH))
+                        caster->RemoveAurasDueToSpell(58427);
                     break;
             }
             break;
