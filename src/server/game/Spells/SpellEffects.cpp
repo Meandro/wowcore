@@ -2169,6 +2169,13 @@ void Spell::EffectTriggerSpell(uint32 effIndex)
         // Coldflame
         case 33801:
             return; // just make the core stfu
+		// Monstrous Bite should cast Monstrous Strength on self 
+		case 54681:
+        {
+            m_caster->CastSpell(m_caster, 54681, true);
+            return;
+        }
+
     }
 
     // normal case
