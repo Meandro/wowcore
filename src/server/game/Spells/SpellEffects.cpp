@@ -5850,7 +5850,10 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         m_caster->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
                     }
                     else
+					{
+                        m_caster->CastSpell(unitTarget, spell_heal, true, NULL, NULL, m_caster->ToTempSummon()->GetSummonerGUID());
                         m_caster->ToTempSummon()->UnSummon();
+					}
                     return;
                 }
                 // Stoneclaw Totem
@@ -5884,6 +5887,11 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         basepoints0 *= aur->GetAmount();
                         m_caster->CastCustomSpell(unitTarget, 55277, &basepoints0, NULL, NULL, true);
                     }
+                    break;
+                }
+                case 67751:// Ghoul Explode
+                {
+                    unitTarget->CastSpell(unitTarget,67729,false); //Explode
                     break;
                 }
                 case 66545: //Summon Memory
@@ -7476,7 +7484,10 @@ void Spell::EffectTitanGrip(uint32 /*eff_idx*/)
 void Spell::EffectRedirectThreat(uint32 /*i*/)
 {
     if (unitTarget)
-        m_caster->SetReducedThreatPercent((uint32)damage, unitTarget->GetGUID());
+		if(this->m_spellInfo->Id==59665) // Vigilance
+			unitTarget->SetReducedThreatPercent((uint32)damage, m_caster->GetGUID());
+		else 
+	        m_caster->SetReducedThreatPercent((uint32)damage, unitTarget->GetGUID());
 }
 
 void Spell::EffectWMODamage(uint32 /*i*/)
@@ -7485,6 +7496,12 @@ void Spell::EffectWMODamage(uint32 /*i*/)
     {
         Unit *caster = m_originalCaster;
         if (!caster)
+            return;
+
+       //Sota, don't damage door if u are too far (more blizzlike)
+       if(m_spellInfo->Id==60206 && (caster->GetDistance2d(gameObjTarget)>19 || m_targets.m_dstPos.GetExactDist2d(gameObjTarget)>13))
+            return;
+       if(m_spellInfo->Id==52339 && m_targets.m_dstPos.GetExactDist2d(gameObjTarget)>19 )
             return;
 
         FactionTemplateEntry const *casterft, *goft;
