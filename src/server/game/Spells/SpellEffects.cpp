@@ -1857,8 +1857,10 @@ void Spell::EffectDummy(uint32 i)
             case 49560: // Death Grip
                 Position pos;
                 GetSummonPosition(i, pos);
-                if (Unit *unit = unitTarget->GetVehicleBase()) // what is this for?
-                    unit->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), damage, true);
+               if((unitTarget == m_caster) || unitTarget->HasAuraType(SPELL_AURA_REFLECT_SPELLS) || unitTarget->HasAuraType(SPELL_AURA_DEFLECT_SPELLS))
+				   return;
+			   if (Unit *unit = unitTarget->GetVehicleBase()) // Disable Death Grip on vehicles
+                   return;
                 else
                     unitTarget->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), damage, true);
                 return;
