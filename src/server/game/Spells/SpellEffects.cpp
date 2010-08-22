@@ -996,6 +996,15 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->CastSpell(unitTarget, effect, true);
                     return;
                 }
+                case 15998:                                 // Capture Worg Pup
+                case 29435:                                 // Capture Female Kaliri Hatchling
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    unitTarget->ToCreature()->ForcedDespawn();
+                    return;
+                }
                 case 16589:                                 // Noggenfogger Elixir
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
