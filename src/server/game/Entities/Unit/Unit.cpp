@@ -2460,7 +2460,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst (const Unit *pVictim, WeaponAttack
     // parry & block chances
 
     // check if attack comes from behind, nobody can parry or block if attacker is behind
-    if (!pVictim->HasInArc(M_PI,this) && !pVictim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION))
+	if (!pVictim->HasInArc(M_PI,this) && !pVictim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION) 
+		&& !pVictim->HasAura(19263)) // Deterrence can parry from behind
     {
         DEBUG_LOG ("RollMeleeOutcomeAgainst: attack came from behind.");
     }
