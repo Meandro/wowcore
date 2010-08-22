@@ -6218,6 +6218,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 triggered_spell_id = 22858;
                 break;
             }
+            // Gag Order
+            if (dummySpell->SpellIconID == 280)
+            { 
+                triggered_spell_id = 18498; 
+                break; 
+            }
             // Second Wind
             if (dummySpell->SpellIconID == 1697)
             {
@@ -6340,7 +6346,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     basepoints0 = int32(damage*triggerAmount/100);
                     break;
                 }
-                // Glyph of Shadowflame
+		    	// Glyph of Succubus
+				case 56250:
+				{
+  				target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+ 				target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+				return true;
+				}
+				// Glyph of Shadowflame
                 case 63310:
                 {
                     triggered_spell_id = 63311;
@@ -6571,6 +6584,25 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     triggered_spell_id = 28810;
                     break;
                 }
+                // Item - Priest T10 Healer 4P Bonus
+                case 70799:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+                    
+                    // Circle of Healing
+                    this->ToPlayer()->RemoveSpellCategoryCooldown(1204, true);
+                    // Penance
+                    this->ToPlayer()->RemoveSpellCategoryCooldown(1230, true);
+
+                    return true;
+                }
+                case 70770: //Item - Priest T10 Healer 2P Bonus
+                {
+                    basepoints0 = int32(damage * 11/100);
+                    triggered_spell_id = 70772;
+                    break;
+                }
             }
             break;
         }
@@ -6655,6 +6687,11 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                         CastCustomSpell(this,60889,&basepoints1,0,0,true,0,triggeredByAura);
                     break;
                 }
+                case 71178: //Item - Druid T10 Restoration Relic (Rejuvenation)
+                {
+                    triggered_spell_id = 71184;
+                    break;
+                }
                 // Healing Touch (Dreamwalker Raiment set)
                 case 28719:
                 {
@@ -6662,6 +6699,14 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     basepoints0 = int32(procSpell->manaCost * 30 / 100);
                     target = this;
                     triggered_spell_id = 28742;
+                    break;
+                }
+                // Item - Druid T10 Balance 4P Bonus
+                case 70723:
+                {
+                    basepoints0 = int32(triggerAmount * damage / 100);
+                    basepoints0 = int32(basepoints0 / 2);
+                    triggered_spell_id = 71023;
                     break;
                 }
                 // Glyph of Rejuvenation
@@ -7020,6 +7065,15 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 case 20337: // rank 3
                     triggered_spell_id = 54499;
                     break;
+                // Item - Paladin T10 Retribution 2P Bonus
+                case 70765:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    this->ToPlayer()->RemoveSpellCooldown(53385, true);
+                    return true;
+                }
                 // Judgement of Light
                 case 20185:
                 {
@@ -7408,12 +7462,55 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     triggered_spell_id = 58879;
                     break;
                 }
+                // Glyph of Totem of Wrath
+                case 63280:
+                {
+                    if (procSpell->SpellIconID != 2019)
+                        return false;
+                    // we need the sp of the totem's spell
+                    CreatureInfo const * cinfo = GetCreatureInfo(procSpell->EffectMiscValue[0]);
+                    if (cinfo && cinfo->spells[0])
+                    {
+                        SpellEntry const * spell = sSpellStore.LookupEntry(cinfo->spells[0]);
+                        basepoints0 = triggerAmount /** spell->CalculateSimpleValue(0)*/ / 100;
+                        target = GetSpellModOwner();
+                        triggered_spell_id = 63283;
+                    }
+                    break;
+                }
                 // Shaman T8 Elemental 4P Bonus
                 case 64928:
                 {
-                    basepoints0 = int32(triggerAmount * damage / 100);
+                    basepoints0 = int32(basepoints0 / 2);
                     triggered_spell_id = 64930;            // Electrified
                     break;
+                }
+                // Shaman T9 Elemental 4P Bonus
+                case 67228:
+                {
+                    basepoints0 = int32(basepoints0 / 3); // basepoints is for 1 tick, not the entire DoT amount
+                    triggered_spell_id = 71824;
+                    break;
+                }
+                // Item - Shaman T10 Restoration 4P Bonus
+                case 70808:
+                {
+                    basepoints0 = int32( triggerAmount * damage / 100 );
+                    basepoints0 = int32( basepoints0 / 3); // basepoints is for 1 tick, not all DoT amount
+                    triggered_spell_id = 70809;
+                    break;
+                }
+                // Item - Shaman T10 Elemental 4P Bonus
+                case 70817:
+                {
+                    if (AuraEffect const * aura = pVictim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0, 0))
+                    {
+                        int32 amount = aura->GetBase()->GetDuration() + triggerAmount * IN_MILLISECONDS;
+                        aura->GetBase()->SetDuration(amount);
+                        //aura->SendAuraUpdate(false);
+                        return true;
+                    }
+                    return false;
                 }
             }
             // Frozen Power
@@ -7623,6 +7720,9 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
             // Blood-Caked Strike - Blood-Caked Blade
             if (dummySpell->SpellIconID == 138)
             {
+                // only melee auto attack affected and Rune Strike
+                if (!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                    return false;
                 if (!target || !target->isAlive())
                     return false;
 
@@ -7680,7 +7780,7 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
             // Unholy Blight
             if (dummySpell->Id == 49194)
             {
-                basepoints0 = triggerAmount * damage / 100;
+                basepoints0 = triggerAmount * damage / 1000;
                 // Glyph of Unholy Blight
                 if (AuraEffect *glyph=GetAuraEffect(63332,0))
                     basepoints0 += basepoints0 * glyph->GetAmount() / 100;
@@ -7708,6 +7808,8 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
             // Necrosis
             if (dummySpell->SpellIconID == 2709)
             {
+                if(!(procFlag & PROC_FLAG_SUCCESSFUL_MELEE_HIT) && procSpell->Id != 56815)
+                    return false;
                 basepoints0 = triggerAmount * damage / 100;
                 triggered_spell_id = 51460;
                 break;
@@ -7789,6 +7891,16 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                 basepoints0 = triggerAmount * damage / 100;
                 triggered_spell_id = 50526;
                 break;
+            }
+            // Item - Death Knight T10 Melee 4P Bonus
+            else if (dummySpell->Id == 70656)
+            {
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                for (uint32 i = 0; i < MAX_RUNES; ++i)
+                    if (this->ToPlayer()->GetRuneCooldown(i) == 0)
+                        return false;
             }
             // Sudden Doom
             if (dummySpell->SpellIconID == 1939 && GetTypeId() == TYPEID_PLAYER)
@@ -8260,6 +8372,10 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
                             CastSpell(pVictim, 27526, true, castItem, triggeredByAura);
                         return true;
                     }
+                    // Mark of the Fallen Champion (boss spell)
+                    case 72293:
+                        CastSpell(pVictim, trigger_spell_id, true, NULL, NULL, pVictim->GetGUID());
+                        return true;
                 }
                 break;
             case SPELLFAMILY_MAGE:
@@ -8377,6 +8493,16 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
                 }
                 break;
             }
+            case SPELLFAMILY_ROGUE:
+            {
+                // Item - Rogue T10 2P Bonus
+                if (auraSpellInfo->Id == 70805)
+                {
+                    if (pVictim != this)
+                        return false;
+                }
+                break;
+            }
             case SPELLFAMILY_HUNTER:
             {
                 if (auraSpellInfo->SpellIconID == 3247)     // Piercing Shots
@@ -8472,6 +8598,24 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
 
                         RemoveAurasDueToSpell(67759);
                         trigger_spell_id = 67760;
+                        target = pVictim;
+                        break;
+                    }
+                    //Item - Coliseum 25 Normal Caster Trinket
+                    case 67712:
+                    {
+                        if(!pVictim || !pVictim->isAlive())
+                            return false;
+                        // stacking
+                        CastSpell(this, 67713, true, NULL, triggeredByAura);
+
+                        Aura * dummy = GetAura(67713);
+                        // release at 3 aura in stack (cont contain in basepoint of trigger aura)
+                        if(!dummy || dummy->GetStackAmount() < triggerAmount)
+                            return false;
+
+                        RemoveAurasDueToSpell(67713);
+                        trigger_spell_id = 67714;
                         target = pVictim;
                         break;
                     }
@@ -8737,6 +8881,13 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, AuraEffect* trig
             return false;
 
         if (!plr->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
+            return false;
+    }
+
+    // Glyph of Death's Embrace
+    else if (auraSpellInfo->Id == 58677)
+    {
+        if (procSpell->Id != 47633)
             return false;
     }
 
@@ -10002,6 +10153,10 @@ Unit* Unit::SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo)
         if (spellInfo->DmgClass == SPELL_DAMAGE_CLASS_NONE)
             return victim;
 
+        //Not redirect non magic spell
+        if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL)
+            return victim;
+
         Unit::AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
         for (Unit::AuraEffectList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
             if (Unit* magnet = (*itr)->GetBase()->GetUnitOwner())
@@ -10444,6 +10599,11 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
             if (spellProto->SpellFamilyFlags[0] & 0x00004000)
                 if (HasAura(200000))
                     DoneTotalMod *= 4;
+            // Shadow bite
+            if (spellProto->SpellFamilyFlags[1] & 0x400000)
+                // Get DoTs on target by owner (15% increase by dot)
+                DoneTotalMod *= float(100.f + 15.f * pVictim->GetDoTsByCaster(GetOwnerGUID())) / 100.f;
+
         break;
         case SPELLFAMILY_DEATHKNIGHT:
             // Improved Icy Touch
@@ -10456,6 +10616,11 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
                 if (AuraEffect * aurEff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 196, 0))
                     if (pVictim->GetDiseasesByCaster(owner->GetGUID()) > 0)
                         DoneTotalMod *= (100.0f + aurEff->GetAmount()) / 100.0f;
+
+            // Sigil of the Vengeful Heart (Death Coil part)
+            if (spellProto->SpellFamilyFlags[0] & 0x2000)
+                if (AuraEffect * aurEff = GetAuraEffect(64962, 1))
+                    DoneTotal += aurEff->GetAmount();
 
             // Impurity (dummy effect)
             if (GetTypeId() == TYPEID_PLAYER)
@@ -10739,7 +10904,7 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                 return false;
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
-            if (schoolMask & SPELL_SCHOOL_MASK_NORMAL)
+            if (schoolMask & SPELL_SCHOOL_MASK_NORMAL && spellProto->SpellIconID != 284 && spellProto->SpellFamilyName != SPELLFAMILY_POTION)
                 crit_chance = 0.0f;
             // For other schools
             else if (GetTypeId() == TYPEID_PLAYER)
@@ -10748,6 +10913,8 @@ bool Unit::isSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
             {
                 crit_chance = m_baseSpellCritChance;
                 crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, schoolMask);
+		        if(ToCreature()->isTotem() && ((Totem*)this)->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+					  crit_chance = ((Totem*)this)->GetOwner()->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + GetFirstSchoolInMask(schoolMask));
             }
             // taken
             if (pVictim)
@@ -11097,14 +11264,13 @@ uint32 Unit::SpellHealingBonus(Unit *pVictim, SpellEntry const *spellProto, uint
         if (spellProto->SpellFamilyFlags[2] & 0x80000000 && spellProto->SpellIconID == 329)
         {
             scripted = true;
+			coeff = 0.0f;
             int32 apBonus = std::max(GetTotalAttackPowerValue(BASE_ATTACK), GetTotalAttackPowerValue(RANGED_ATTACK));
-            if (apBonus > DoneAdvertisedBenefit)
-            {
-                DoneTotal += apBonus * 0.2f;
-                coeff = 0.0f;
-            }
+			int32 spBonus = SpellBaseDamageBonus(SPELL_SCHOOL_MASK_HOLY);
+			if (apBonus > spBonus)
+				DoneTotal += apBonus * 0.220f;
             else
-                coeff = 1.0f;
+                DoneTotal += spBonus * 0.377f;
         }
         // Earthliving - 0.45% of normal hot coeff
         else if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN && spellProto->SpellFamilyFlags[1] & 0x80000)
@@ -12142,7 +12308,8 @@ bool Unit::isVisibleForOrDetect(Unit const* u, bool detect, bool inVisibleList, 
 {
     if (!u || !IsInMap(u))
         return false;
-
+    if (HasAura(SPELL_ARENA_PREPARATION) && IsHostileTo(u))
+        return false;
     return u->canSeeOrDetect(this, detect, inVisibleList, is3dDistance);
 }
 
@@ -12202,6 +12369,8 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
         return false;
     if (distance < 0.24f) //collision
         return true;
+    if (target->hasUnitState(UNIT_STAT_STUNNED))
+        return true;
     if (!HasInArc(M_PI, target)) //behind
         return false;
     if (HasAuraType(SPELL_AURA_DETECT_STEALTH))
@@ -12213,13 +12382,23 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance) const
             return true;
 
     //Visible distance based on stealth value (stealth rank 4 300MOD, 10.5 - 3 = 7.5)
-    float visibleDistance = 7.5f;
+    float visibleDistance = 10.5f;
     //Visible distance is modified by -Level Diff (every level diff = 1.0f in visible distance)
-    visibleDistance += float(getLevelForTarget(target)) - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH)/5.0f;
+    visibleDistance += float(getLevel() - target->getLevel());
+	visibleDistance -= target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH)/100.0f;
     //-Stealth Mod(positive like Master of Deception) and Stealth Detection(negative like paranoia)
     //based on wowwiki every 5 mod we have 1 more level diff in calculation
-    visibleDistance += (float)(GetTotalAuraModifier(SPELL_AURA_MOD_DETECT) - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL)) / 5.0f;
+    visibleDistance += GetTotalAuraModifier(SPELL_AURA_MOD_DETECT) / 5.0f - target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH_LEVEL) / 5.0f;
     visibleDistance = visibleDistance > MAX_PLAYER_STEALTH_DETECT_RANGE ? MAX_PLAYER_STEALTH_DETECT_RANGE : visibleDistance;
+
+   if (HasInArc(M_PI/6, target))       
+       visibleDistance *= 1.0f;        // from 0 to M_PI/6 100% DETECTION   
+   else if (HasInArc(M_PI/3, target))  
+	   visibleDistance *= 0.75f;	   // from M_PI/6 TO M_PI/3 75% DETECTION   
+   else if (HasInArc(M_PI, target))    
+	   visibleDistance *= 0.5f;        // from M_PI/3 to M_PI 50% DETECTION   
+   else
+	   visibleDistance *= 0.25f; 	   // BEHIND 25% DETECTION   
 
     return distance < visibleDistance;
 }
@@ -12974,7 +13153,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
 
 float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration,Unit* caster,DiminishingLevels Level, int32 limitduration)
 {
-    if (duration == -1 || group == DIMINISHING_NONE || caster->IsFriendlyTo(this))
+    if (duration == -1 || group == DIMINISHING_NONE ) //|| caster->IsFriendlyTo(this)) comment to fix bug with mind control and spell reflection
         return 1.0f;
 
     // test pet/charm masters instead pets/charmeds
