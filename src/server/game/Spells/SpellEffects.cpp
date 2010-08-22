@@ -5064,7 +5064,14 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                         DoCreateItem(effIndex,item);
                     break;
                 }
-                // Improved Sprint
+				// Earthen Power
+				case 51524:
+				{
+				    // Removes snares and roots.
+				    unitTarget->RemoveMovementImpairingAuras();
+				    break;
+				}
+				// Improved Sprint
                 case 30918:
                 {
                     // Removes snares and roots.
