@@ -556,8 +556,13 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                 {
                     if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet())
                     {
-                        // Get DoTs on target by owner (5% increase by dot)
-                        damage += 5 * unitTarget->GetDoTsByCaster(m_caster->GetOwnerGUID()) / 100;
+						Unit * pet_owner = m_caster->GetOwner();
+						if (pet_owner->HasAura(54037))
+						{
+							m_caster->CastSpell(m_caster, 54425, true, 0);
+							if (pet_owner->HasAura(54038))
+								m_caster->CastSpell(m_caster, 54425, true, 0);
+						}
                     }
                 }
                 break;
