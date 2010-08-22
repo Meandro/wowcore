@@ -3066,7 +3066,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
         for (Unit::AuraEffectList::const_iterator i = mReflectSpellsSchool.begin(); i != mReflectSpellsSchool.end(); ++i)
             if ((*i)->GetMiscValue() & GetSpellSchoolMask(spell))
                 reflectchance += (*i)->GetAmount();
-        if (reflectchance > 0 && roll_chance_i(reflectchance))
+        if (reflectchance > 0 && roll_chance_i(reflectchance) && !(spell->SchoolMask & SPELL_SCHOOL_MASK_NORMAL))
         {
             // Start triggers for remove charges if need (trigger only for victim, and mark as active spell)
             ProcDamageAndSpell(pVictim, PROC_FLAG_NONE, PROC_FLAG_TAKEN_NEGATIVE_MAGIC_SPELL, PROC_EX_REFLECT, 1, BASE_ATTACK, spell);
@@ -4192,10 +4192,35 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit
 
             // Unstable Affliction (crash if before removeaura?)
             if (aura->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && (aura->GetSpellProto()->SpellFamilyFlags[1] & 0x0100))
+				if (aura->GetId() == 30108 || aura->GetId() == 30404 || aura->GetId() == 30405 || aura->GetId() == 47841 || aura->GetId() == 47843)
             {
+					int32 SM_modifier;
                 if (AuraEffect const * aurEff = aura->GetEffect(0))
                 {
                     int32 damage = aurEff->GetAmount()*9;
+					uint64 caster_guid = aura->GetCasterGUID();
+					Unit *caster = aura->GetCaster();
+					//Shadow Mastery and Spell Power bonus
+			        SpellBonusEntry const* SpBonus = spellmgr.GetSpellBonusData(31117);		//sp modifier for this spell (180%)
+                    int32 SpellPower = caster->SpellBaseDamageBonus(SPELL_SCHOOL_MASK_SHADOW);//get spell power
+                    uint32 RealSpellPower = SpellPower *SpBonus->direct_damage;					//spell power * modifier
+					Unit::AuraEffectList const& mAddPctModifierAuras = caster->GetAuraEffectsByType(SPELL_AURA_ADD_PCT_MODIFIER);
+	                for(Unit::AuraEffectList::const_iterator AE = mAddPctModifierAuras.begin(); AE != mAddPctModifierAuras.end(); ++AE)
+	                {
+	                    switch ((*AE)->GetId())
+	                    {
+	                        case 18271:
+	                        case 18272:
+	                        case 18273:
+	                        case 18274:
+	                        case 18275:
+	                        {
+								SM_modifier = (*AE)->GetAmount()/100;//shadow mastery modifier
+	                            break;
+							}
+						}
+	                }
+					int32 totalDamage = (damage + RealSpellPower) * (1 + SM_modifier) ;
                     // backfire damage and silence
                     dispeller->CastCustomSpell(dispeller, 31117, &damage, NULL, NULL, true, NULL, NULL, aura->GetCasterGUID());
                 }
