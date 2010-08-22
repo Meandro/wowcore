@@ -1408,13 +1408,16 @@ void Spell::EffectDummy(uint32 i)
                 }
                 case 51582:                                 //Rocket Boots Engaged (Rocket Boots Xtreme and Rocket Boots Xtreme Lite)
                 {
+                    if (!m_CastItem) return;
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+                    ((Player*)m_caster)->RemoveSpellCooldown(30452, true);
                     if (Battleground* bg = m_caster->ToPlayer()->GetBattleground())
                         bg->EventPlayerDroppedFlag(m_caster->ToPlayer());
 
                     m_caster->CastSpell(m_caster, 30452, true, NULL);
+                    ((Player*)m_caster)->AddSpellCooldown(30452,m_CastItem->GetEntry(), time(NULL)+300);
                     return;
                 }
                 case 52308:                                 // Take Sputum Sample
