@@ -5567,6 +5567,44 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     RemoveAuraFromStack(24659);
                     return true;
                 }
+                // Shadowmourne
+                case 71903: 
+                { 
+                    Aura *aur = GetAura(71905, 0); 
+                    if (aur && aur->GetStackAmount() + 1 >= aur->GetSpellProto()->StackAmount)
+                    { 
+                        RemoveAurasDueToSpell(71905); 
+						RemoveAurasDueToSpell(72521);
+						RemoveAurasDueToSpell(72523);
+						CastSpell(this, 73422, true);		// Chaos Bane - 270 strengh
+						CastSpell(this, 71904, true);       	// Chaos Bane - damage
+							return true; 
+                    } 
+                    else if (aur && aur->GetStackAmount() <= 4)
+					{
+						CastSpell(this, 72521, true);	    // Visual Effect
+                        triggered_spell_id = 71905; 
+					}
+					else if (aur && aur->GetStackAmount() <= 9 && aur->GetStackAmount() >= 5)
+					{
+						RemoveAurasDueToSpell(72521);
+						CastSpell(this, 72523, true);	    // Visual Effect
+                        triggered_spell_id = 71905; 
+					}
+					else if (aur && aur->GetStackAmount() <= 1)
+					{
+						triggered_spell_id = 71905;
+						RemoveAurasDueToSpell(72521);
+						RemoveAurasDueToSpell(72523);
+					}
+					else
+					{
+						triggered_spell_id = 71905;
+						RemoveAurasDueToSpell(72521);
+						RemoveAurasDueToSpell(72523);
+					}
+                    break;
+                }
                 // Restless Strength
                 case 24661:
                 {
@@ -6089,6 +6127,12 @@ bool Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, AuraEffect* trigger
                     target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
                     target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                     return true;
+				// Glyph of Drain Soul 
+                case 58070:
+                {
+                    triggered_spell_id = 58068;
+                    break;
+                }
                 // Glyph of Icy Veins
                 case 56374:
                 {
