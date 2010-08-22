@@ -5688,6 +5688,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const * aurApp, uint8 mode, boo
                     break;
             }
         }
+				case 71563: // Deadly Precision
+						for (int i = 0; i < 5; ++i)
+							caster->CastSpell(caster, 71564, true, NULL, this);
+						break;
         // AT REMOVE
         else
         {
