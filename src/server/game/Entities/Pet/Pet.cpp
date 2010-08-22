@@ -883,7 +883,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(createResistance[i]));
 
     //health, mana, armor and resistance
-    PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
+ 	    if (petType == HUNTER_PET)
+ 	        pInfo = objmgr.GetPetLevelInfo(1, petlevel);
+ 	    else
+ 	        pInfo = objmgr.GetPetLevelInfo(creature_ID, petlevel);
     if (pInfo)                                      // exist in DB
     {
         SetCreateHealth(pInfo->health);
@@ -955,8 +958,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     if (!pInfo)
                         SetCreateHealth(30 + 30*petlevel);
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - (petlevel / 2)));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + (petlevel / 2)));
+					int32 bonus_dmg=m_owner->SpellBaseDamageBonus(SPELL_SCHOOL_MASK_NATURE)*0.15f;
+					SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 7.5f - (petlevel / 2) + bonus_dmg));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 7.5f + (petlevel / 2) + bonus_dmg));
                     break;
                 }
                 case 15352: //earth elemental 36213
