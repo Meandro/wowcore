@@ -115,12 +115,9 @@ void SpellCastTargets::setSrc(float x, float y, float z)
 
 void SpellCastTargets::setSrc(Position &pos)
 {
-    if (pos)
-	{
 	m_srcPos.Relocate(pos);
     m_srcTransGUID = 0;
     m_targetMask |= TARGET_FLAG_SOURCE_LOCATION;
-	}
 }
 
 void SpellCastTargets::setSrc(WorldObject &wObj)
@@ -1445,7 +1442,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask, bool 
             // I do not think this is a correct way to fix it. Sanctuary effect should make all delayed spells invalid
             // for delayed spells ignore not visible explicit target
             if (m_spellInfo->speed > 0.0f && unit == m_targets.getUnitTarget()
-                && (unit->m_invisibilityMask || m_caster->m_invisibilityMask)
+                && ((unit->m_invisibilityMask || m_caster->m_invisibilityMask) || unit->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STEALTH, SPELLFAMILY_ROGUE, SPELLFAMILYFLAG_ROGUE_VANISH))
                 && !m_caster->canSeeOrDetect(unit, true))
             {
                 // that was causing CombatLog errors
@@ -5179,7 +5176,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }*/
 
-    if (!m_IsTriggeredSpell)
+	if (!m_IsTriggeredSpell || m_spellInfo->Id == 33395)
     {
         SpellCastResult castResult = CheckRange(strict);
         if (castResult != SPELL_CAST_OK)
