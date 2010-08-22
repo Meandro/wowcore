@@ -3895,6 +3895,11 @@ void SpellMgr::LoadSpellCustomAttr()
             spellInfo->AttributesEx |= SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY;
             count++;
             break;
+        case 63623: // Avoidance shadow fiend
+        case 62137: // Avoidance summoned ghoul
+        case 32233: // Avoidance warlock pet
+        case 65220: // Avoidance hunter pet
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE;
         case 69055:     // Saber Lash
         case 70814:     // Saber Lash
             spellInfo->EffectRadiusIndex[0] = 8;
