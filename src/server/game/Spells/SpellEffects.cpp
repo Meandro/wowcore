@@ -1753,6 +1753,50 @@ void Spell::EffectDummy(uint32 i)
                 m_caster->CastCustomSpell(unitTarget, 52032, &damage, 0, 0, true, 0, 0, m_originalCasterGUID);
                 return;
             }
+            if (m_spellInfo->Id == 39610)                    // Mana Tide Totem effect
+            {
+                if (!unitTarget || unitTarget->getPowerType() != POWER_MANA)
+                    return;
+                // Glyph of Mana Tide
+                if (Unit *owner = m_caster->GetOwner())
+                    if (AuraEffect *dummy = owner->GetAuraEffect(55441, 0))
+                        damage += dummy->GetAmount();
+                // Regenerate 6% of Total Mana Every 3 secs
+                int32 EffectBasePoints0 = unitTarget->GetMaxPower(POWER_MANA) * damage / 100;
+                m_caster->CastCustomSpell(unitTarget, 39609, &EffectBasePoints0, NULL, NULL, true, NULL, NULL, m_originalCasterGUID);
+                return;
+            }
+            // Fire Nova
+            if (m_spellInfo->SpellIconID == 33)
+            {
+                if (!m_caster)
+                    return;
+
+                uint32 triggered_spell_id;
+                switch(m_spellInfo->Id)
+                {
+                    case 1535:  triggered_spell_id = 8349; break;
+                    case 8498:  triggered_spell_id = 8502; break;
+                    case 8499:  triggered_spell_id = 8503; break;
+                    case 11314: triggered_spell_id = 11306; break;
+                    case 11315: triggered_spell_id = 11307; break;
+                    case 25546: triggered_spell_id = 25535; break;
+                    case 25547: triggered_spell_id = 25537; break;
+                    case 61649: triggered_spell_id = 61650; break;
+                    case 61657: triggered_spell_id = 61654; break;
+                    default:
+                        break;
+                }
+                // fire slot
+                if (triggered_spell_id && m_caster->m_SummonSlot[1])
+                {
+                    Creature* totem = m_caster->GetMap()->GetCreature(m_caster->m_SummonSlot[1]);
+                    if (totem && totem->isTotem())
+                        totem->CastSpell(totem, triggered_spell_id, true);
+                    return;
+                }
+                return;
+            }
             // Lava Lash
             if (m_spellInfo->SpellFamilyFlags[2] & SPELLFAMILYFLAG2_SHAMAN_LAVA_LASH)
             {
