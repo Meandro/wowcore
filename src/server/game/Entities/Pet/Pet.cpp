@@ -864,8 +864,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             scale = cFamily->minScale;
         else
             scale = cFamily->minScale + float(getLevel() - cFamily->minScaleLevel) / cFamily->maxScaleLevel * (cFamily->maxScale - cFamily->minScale);
+	   //hackfix for T-Rex
+		if (GetCreatureInfo()->family == 39)
+		  scale = scale * 3;
 
-        SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
+	  SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
     }
 
     //resistance
@@ -883,6 +886,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(createResistance[i]));
 
     //health, mana, armor and resistance
+	PetLevelInfo const* pInfo;
  	    if (petType == HUNTER_PET)
  	        pInfo = objmgr.GetPetLevelInfo(1, petlevel);
  	    else
