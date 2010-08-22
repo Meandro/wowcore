@@ -4201,7 +4201,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint64 casterGUID, Unit
 					uint64 caster_guid = aura->GetCasterGUID();
 					Unit *caster = aura->GetCaster();
 					//Shadow Mastery and Spell Power bonus
-			        SpellBonusEntry const* SpBonus = spellmgr.GetSpellBonusData(31117);		//sp modifier for this spell (180%)
+			        SpellBonusEntry const* SpBonus = sSpellMgr.GetSpellBonusData(31117);		//sp modifier for this spell (180%)
                     int32 SpellPower = caster->SpellBaseDamageBonus(SPELL_SCHOOL_MASK_SHADOW);//get spell power
                     uint32 RealSpellPower = SpellPower *SpBonus->direct_damage;					//spell power * modifier
 					Unit::AuraEffectList const& mAddPctModifierAuras = caster->GetAuraEffectsByType(SPELL_AURA_ADD_PCT_MODIFIER);
