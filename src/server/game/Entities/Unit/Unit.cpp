@@ -566,6 +566,39 @@ void Unit::DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb)
 
 uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss)
 {
+    if(GetTypeId() == TYPEID_UNIT)
+    {
+        if (HasSpell(58877))        // Spirit Hunt
+        {
+            Unit* target = this;
+            if (target)
+            {
+                Unit *targetOwner = GetOwner();
+                if (targetOwner)
+                {
+                    int32 heal = damage * 1.50;
+                    this->CastCustomSpell(targetOwner,58879,&heal,0,0,true);
+                    this->CastCustomSpell(target,58879,&heal,0,0,true);
+                }
+            }
+        }
+        else 
+		if (HasSpell(50453))        // Bloodworms Health Leech //clotza hax
+        {
+            Unit* target = this;
+            if (target)
+            {
+                Unit *targetOwner = GetOwner();
+                if (targetOwner)
+                {
+                    int32 heal = damage * 1.50;
+                    this->CastCustomSpell(targetOwner,58879,&heal,0,0,true);
+                    this->CastCustomSpell(target,58879,&heal,0,0,true);
+                }
+            }
+        }
+    }
+
     if (pVictim->GetTypeId() == TYPEID_UNIT && pVictim->ToCreature()->IsAIEnabled)
         pVictim->ToCreature()->AI()->DamageTaken(this, damage);
 
