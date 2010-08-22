@@ -1671,8 +1671,22 @@ void Spell::EffectDummy(uint32 i)
             if (m_spellInfo->Id == 5229 && m_caster->HasAura(70726))
                 m_caster->CastSpell(m_caster, 70725, true);
             break;
+        case SPELLFAMILY_HUNTER:
+            switch(m_spellInfo->Id)
+            {
+                case 37506:                                 // Scatter Shot
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
 
-        case SPELLFAMILY_PALADIN:
+                    // break Auto Shot and autohit
+                    m_caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+                    m_caster->AttackStop();
+                    m_caster->ToPlayer()->SendAttackSwingCancelAttack();
+                    return;
+                }
+            }
+         case SPELLFAMILY_PALADIN:
             // Divine Storm
             if (m_spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_PALADIN_DIVINESTORM && i == 1)
             {
