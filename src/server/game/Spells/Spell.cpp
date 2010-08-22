@@ -5859,8 +5859,26 @@ SpellCastResult Spell::CheckCasterAuras() const
     SpellCastResult prevented_reason = SPELL_CAST_OK;
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
     uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
-    if (unitflag & UNIT_FLAG_STUNNED && !(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_STUNNED))
+ 	    if (unitflag & UNIT_FLAG_STUNNED )
+ 	    {
+ 	        if (m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_STUNNED)
+ 	            if (m_caster->HasAuraState(AURA_STATE_FROZEN))
+ 	                prevented_reason = SPELL_FAILED_STUNNED;
+ 	            else {
+ 	                Unit::AuraApplicationMap& Auras = m_caster->GetAppliedAuras();
+ 	                for (Unit::AuraApplicationMap::iterator iter = Auras.begin(); iter != Auras.end(); ++iter)
+ 	                {
+ 	                    Aura const * aura = iter->second->GetBase();
+ 	                    if (GetAllSpellMechanicMask(aura->GetSpellProto()) & ((1<<MECHANIC_KNOCKOUT) | (1<<MECHANIC_SAPPED)))
+ 	                    {
+ 	                        prevented_reason = SPELL_FAILED_STUNNED;
+ 	                        break;
+ 	                    }
+ 	                }
+ 	            }
+ 	        else
         prevented_reason = SPELL_FAILED_STUNNED;
+		}
     else if (unitflag & UNIT_FLAG_CONFUSED && !(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED))
         prevented_reason = SPELL_FAILED_CONFUSED;
     else if (unitflag & UNIT_FLAG_FLEEING && !(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_FEARED))
