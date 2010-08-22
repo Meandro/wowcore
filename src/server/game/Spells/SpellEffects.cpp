@@ -329,7 +329,17 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
             case SPELLFAMILY_GENERIC:
             {
                 // Meteor like spells (divided damage to targets)
-                if (m_customAttr & SPELL_ATTR_CU_SHARE_DAMAGE)
+                if ((m_customAttr & SPELL_ATTR_CU_SHARE_DAMAGE) 
+					|| (m_spellInfo->Id == 71904) // Chaos Bane
+					|| (m_spellInfo->Id == 72505) // Ooze Eruption
+					|| (m_spellInfo->Id == 70492) // Ooze Eruption
+					|| (m_spellInfo->Id == 72624) // Ooze Eruption
+					|| (m_spellInfo->Id == 72625) // Ooze Eruption
+					|| (m_spellInfo->Id == 64422) // Sonic Screech
+					|| (m_spellInfo->Id == 64688) // Sonic Screech
+					|| (m_spellInfo->Id == 69055) // Bone Slice
+					|| (m_spellInfo->Id == 70814) // Bone Slice
+					)
                 {
                     uint32 count = 0;
                     for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
