@@ -53,7 +53,7 @@ if (GetStatus() == STATUS_IN_PROGRESS)
         if(m_uiKnockback < diff && KnockbackCheck)
         {
             //dalaran sewers = 617;
-            for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+            for(BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             {
                 Player * plr = sObjectMgr.GetPlayer(itr->first);
                 if (plr && plr->GetDistance2d(1214, 765) <= 50 && plr->GetPositionZ() > 10)
@@ -69,7 +69,7 @@ if (GetStatus() == STATUS_IN_PROGRESS)
         if(m_uiTeleport < diff && TeleportCheck)
         {
             //dalaran sewers = 617;
-            for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+            for(BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             {
                 Player * plr = sObjectMgr.GetPlayer(itr->first);
                 if (plr && plr->GetDistance2d(1214, 765) <= 50 && plr->GetPositionZ() > 10)
