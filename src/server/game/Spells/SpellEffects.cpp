@@ -2066,29 +2066,10 @@ void Spell::EffectTriggerSpell(uint32 effIndex)
             if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            // get highest rank of the Stealth spell
-            uint32 spellId = 0;
-            SpellEntry const *spellInfo;
-            const PlayerSpellMap& sp_list = unitTarget->ToPlayer()->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
-            {
-                // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second->active || itr->second->disabled || itr->second->state == PLAYERSPELL_REMOVED)
-                    continue;
-
-                spellInfo = sSpellStore.LookupEntry(itr->first);
+            // Stealth spell
+            uint32 spellId = 1784;
+            SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
                 if (!spellInfo)
-                    continue;
-
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_STEALTH)
-                {
-                    spellId = spellInfo->Id;
-                    break;
-                }
-            }
-
-            // no Stealth spell found
-            if (!spellId)
                 return;
 
             // reset cooldown on it if needed
