@@ -3210,6 +3210,9 @@ bool SpellMgr::CanAurasStack(SpellEntry const *spellInfo_1, SpellEntry const *sp
         // Hack for Incanter's Absorption
         if (spellId_1 == 44413)
             return true;
+        // and another one for Explosive Shot from different hunters
+        if (spellId_1 == 60053 && !sameCaster)
+            return true;
         // same spell with same caster should not stack
         return false;
     }
