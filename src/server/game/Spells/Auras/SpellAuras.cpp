@@ -1364,6 +1364,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const * aurApp, Unit * caster,
                         // Search talent
                         if (owner->HasAura(34692))
                         {
+							//hackfix
+                            if (owner->HasAura(13810) || owner->HasAura(68766) || owner->HasAura(55741))
+                            {
+                                owner->RemoveAura(13810);
+                                owner->RemoveAura(68766);
+                                owner->RemoveAura(55741);
+                            }
                             if (apply)
                                 owner->CastSpell(owner, 34471, true, 0, GetEffect(0));
                             else
