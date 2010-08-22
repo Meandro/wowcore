@@ -618,6 +618,9 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                 }
                 break;
             }
+                // Improved Devouring Plague should not get any bonus
+				else if (m_spellInfo->Id == 63675)
+					apply_direct_bonus = false;
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
