@@ -597,6 +597,7 @@ int32 ArenaTeam::WonAgainst(uint32 againstRating)
     float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
     // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
     int32 mod = (int32)floor(K* (1.0f - chance));
+	mod = mod ? mod : 1; // can not win 0 rating
 
     // modify the team stats accordingly
     FinishGame(mod);
@@ -620,6 +621,7 @@ int32 ArenaTeam::LostAgainst(uint32 againstRating)
 
     float K = 32.0f;
     int32 mod = (int32)ceil(K * (0.0f - chance));
+	mod = mod ? mod : -1; // can not lose 0 rating
     // modify the team stats accordingly
     FinishGame(mod);
 
@@ -639,6 +641,7 @@ void ArenaTeam::MemberLost(Player * plr, uint32 againstRating)
             float K = (itr->personal_rating < 1000) ? 48.0f : 32.0f;
             // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
             int32 mod = (int32)ceil(K * (0.0f - chance));
+			mod = mod ? mod : -1; // can not lose 0 rating
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal played stats
             itr->games_week +=1;
@@ -663,6 +666,7 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstRating)
             float K = (itr->personal_rating < 1000) ? 48.0f : 32.0f;
             // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
             int32 mod = (int32)ceil(K * (0.0f - chance));
+			mod = mod ? mod : -1; // can not lose 0 rating
             if (int32(itr->personal_rating) + mod < 0)
                 itr->personal_rating = 0;
             else
@@ -687,6 +691,7 @@ void ArenaTeam::MemberWon(Player * plr, uint32 againstRating)
             float K = (itr->personal_rating < 1000) ? 48.0f : 32.0f;
             // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
             int32 mod = (int32)floor(K* (1.0f - chance));
+			mod = mod ? mod : 1; // can not win 0 rating
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal stats
             itr->games_week +=1;
