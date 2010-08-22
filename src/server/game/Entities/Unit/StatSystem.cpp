@@ -162,7 +162,8 @@ bool Player::UpdateAllStats()
 
     UpdateArmor();
     // calls UpdateAttackPowerAndDamage() in UpdateArmor for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
-    UpdateAttackPowerAndDamage(true);
+    UpdateAttackPowerAndDamage(false);
+	UpdateAttackPowerAndDamage(true);
     UpdateMaxHealth();
 
     for (int i = POWER_MANA; i < MAX_POWERS; ++i)
@@ -934,6 +935,7 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 #define ENTRY_TREANT            1964
 #define ENTRY_FIRE_ELEMENTAL    15438
 #define ENTRY_GHOUL             26125
+#define ENTRY_EARTH_ELEMENTAL   15352
 
 bool Guardian::UpdateStats(Stats stat)
 {
@@ -1060,7 +1062,7 @@ void Guardian::UpdateArmor()
     UnitMods unitMod = UNIT_MOD_ARMOR;
 
     // hunter and warlock pets gain 35% of owner's armor value
-    if (isPet())
+    if(isPet()&&!IsPetGhoul())
         bonus_armor = 0.35f * float(m_owner->GetArmor());
 
     value  = GetModifierValue(unitMod, BASE_VALUE);
@@ -1075,7 +1077,8 @@ void Guardian::UpdateArmor()
 void Guardian::UpdateMaxHealth()
 {
     UnitMods unitMod = UNIT_MOD_HEALTH;
-    float stamina = GetStat(STAT_STAMINA) - GetCreateStat(STAT_STAMINA);
+    //Ghouls have no base hp. only the one gained from stamina
+    float stamina = GetStat(STAT_STAMINA) - (GetEntry()==ENTRY_GHOUL ? 0.0f : GetCreateStat(STAT_STAMINA));
 
     float multiplicator;
     switch(GetEntry())
@@ -1086,10 +1089,22 @@ void Guardian::UpdateMaxHealth()
         case ENTRY_FELHUNTER:   multiplicator = 9.5f;   break;
         case ENTRY_FELGUARD:    multiplicator = 11.0f;  break;
         case ENTRY_GHOUL:       multiplicator = 10.0f;   break;
-        default:                multiplicator = 10.0f;  break;
+		case ENTRY_FIRE_ELEMENTAL:       multiplicator = 1.0f;  break;
+		case ENTRY_EARTH_ELEMENTAL:       multiplicator = 20.0f;  break;
+		default:
+			{
+			if (isGuardian() || isTotem())
+				multiplicator = 0.0f;                 // Guardians and Totems gain no hp from the owner
+			else
+			    multiplicator = 10.0f;                // Pets, and Minions do get health from stamina
+			break;
+			}
     }
-
-    float value   = GetModifierValue(unitMod, BASE_VALUE) + GetCreateHealth();
+	if (isHunterPet())
+		multiplicator = 10.0f;
+    
+	//Ghouls have no base hp. only the one gained from stamina
+	float value   = (GetEntry()==ENTRY_GHOUL ? 0 : GetModifierValue(unitMod, BASE_VALUE) + GetCreateHealth());
     value  *= GetModifierValue(unitMod, BASE_PCT);
     value  += GetModifierValue(unitMod, TOTAL_VALUE) + stamina * multiplicator;
     value  *= GetModifierValue(unitMod, TOTAL_PCT);
@@ -1219,7 +1234,7 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
                 bonusDamage = spellDmg * 0.09f;
         }
         //greater fire elemental
-        else if (GetEntry() == ENTRY_FIRE_ELEMENTAL)
+        else if (GetEntry() == ENTRY_FIRE_ELEMENTAL || GetEntry() == ENTRY_EARTH_ELEMENTAL)
         {
             int32 spellDmg = int32(m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE)) - m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
             if (spellDmg > 0)
