@@ -80,6 +80,7 @@ if (GetStatus() == STATUS_IN_PROGRESS)
             TeleportCheck = false;
             // close the gate
         }else m_uiTeleport -= diff;
+		}
 
     if (getWaterFallTimer() < diff)
     {
