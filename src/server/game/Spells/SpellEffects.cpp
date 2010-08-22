@@ -4431,11 +4431,19 @@ void Spell::SpellDamageWeaponDmg(uint32 i)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
                 }
-                // 50% more damage with daggers
+                // more damage with daggers
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                         if (item->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.5f;
+							switch (m_spellInfo->Id)
+							{
+								case 14278: totalDamagePercentMod *= 1.8f;  // Ghostly Strike
+									break;
+								case 51723: totalDamagePercentMod *= 1.05f; // Fan of Knives
+									break;
+								default: totalDamagePercentMod *= 1.6f;		// Hemorrhage
+									break;
+							}
             }
             // Mutilate (for each hand)
             else if (m_spellInfo->SpellFamilyFlags[1] & 0x6)
