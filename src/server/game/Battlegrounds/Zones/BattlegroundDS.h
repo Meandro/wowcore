@@ -67,19 +67,23 @@ class BattlegroundDS : public Battleground
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);
+        virtual void Reset();
+        virtual void FillInitialWorldStates(WorldPacket &d);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
 
         void RemovePlayer(Player *plr, uint64 guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         bool SetupBattleground();
-        virtual void Reset();
-        virtual void FillInitialWorldStates(WorldPacket &d);
         void HandleKillPlayer(Player* player, Player *killer);
         bool HandlePlayerUnderMap(Player * plr);
     private:
         uint32 m_waterTimer;
         bool m_waterfallActive;
+        bool TeleportCheck;
+        bool KnockbackCheck;
+        uint32 m_uiTeleport;
+        uint32 m_uiKnockback;
     protected:
         bool isWaterFallActive() { return m_waterfallActive; };
         void setWaterFallActive(bool active) { m_waterfallActive = active; };
