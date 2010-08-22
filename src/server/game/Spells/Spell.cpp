@@ -5727,6 +5727,17 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
+            case SPELL_AURA_RANGED_AP_ATTACKER_CREATURES_BONUS:
+            {
+                if (!m_targets.getUnitTarget() && m_targets.getUnitTarget()->GetTypeId() != TYPEID_UNIT)
+                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
+                // can be casted at non-friendly unit or own pet/charm
+                if (m_caster->IsFriendlyTo(m_targets.getUnitTarget()))
+                    return SPELL_FAILED_TARGET_FRIENDLY;
+
+                break;
+            }
             case SPELL_AURA_PERIODIC_MANA_LEECH:
             {
                 if (!m_targets.getUnitTarget())
