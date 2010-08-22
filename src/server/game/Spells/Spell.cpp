@@ -5573,6 +5573,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_caster->ToPlayer()->IsInFeralForm())
                             return SPELL_FAILED_ONLY_SHAPESHIFT;
                         break;
+                    // Wild Growth
+                    case 48438:
+                    case 53248:
+                    case 53249:
+                    case 53251:
+                    {
+                        if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                            return SPELL_FAILED_DONT_REPORT;
+
+                        Unit* target = m_targets.getUnitTarget();
+                        if (!target || target->GetTypeId() != TYPEID_PLAYER)
+                            return SPELL_FAILED_BAD_TARGETS;
+
+                        if (!m_caster->ToPlayer()->IsInSameRaidWith(target->ToPlayer()))
+                            return SPELL_FAILED_TARGET_NOT_IN_RAID;
+
+                        break;
+                    }
                     case 1515:
                     {
                         if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5664,6 +5682,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (m_caster->IsInWater())
                     return SPELL_FAILED_ONLY_ABOVEWATER;
+
+                if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->GetTransport())
+                    return SPELL_FAILED_NO_MOUNTS_ALLOWED;
 
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells
                 bool AllowMount = !m_caster->GetMap()->IsDungeon() || m_caster->GetMap()->IsBattlegroundOrArena();
