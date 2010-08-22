@@ -779,6 +779,15 @@ bool SpellMgr::_isPositiveEffect(uint32 spellId, uint32 effIndex, bool deep) con
             if (spellproto->SpellFamilyFlags[0] == 0x00002000)
                 return true;
             break;
+			switch(spellId) 
+            {
+                case 11103: // Impact talent
+                case 12357: // Impact talent
+                case 12358: // Impact talent
+                case 64343: // Impact buff
+                    return true;
+                    break;
+            }
         case SPELLFAMILY_PRIEST:
             switch (spellId)
             {
