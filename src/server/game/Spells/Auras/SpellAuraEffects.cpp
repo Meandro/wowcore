@@ -2380,6 +2380,12 @@ bool AuraEffect::IsAffectedOnSpell(SpellEntry const *spell) const
     // Check EffectClassMask
     if (m_spellProto->EffectSpellClassMask[m_effIndex] & spell->SpellFamilyFlags)
         return true;
+
+	// hackfix
+	// Twisted Faith (SpellClassMask = 00000000 00000000 00002000) should affect Mind Flay (SpellFamilyFlags = 0x00000440 00000000 00000000) - wrong DBC data?
+	if (spell->SpellIconID==548 && m_spellProto->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellProto->SpellIconID==2848)
+		return true;
+
     return false;
 }
 
