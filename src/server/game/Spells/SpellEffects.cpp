@@ -1586,7 +1586,12 @@ void Spell::EffectDummy(uint32 i)
                 m_damage+= uint32(damage * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) / 100);
                 return;
             }
-            switch(m_spellInfo->Id)
+            // Item - Warrior T10 Melee 4P Bonus
+            if (m_spellInfo->Id == 46916 || m_spellInfo->Id == 52437)
+                if (Aura * aur = m_caster->GetAura(70847))
+                    if (roll_chance_i(20))
+                        m_caster->CastSpell(m_caster, 70849, true);
+			switch(m_spellInfo->Id)
             {
                 // Bloodthirst
                 case 23881:
@@ -1638,6 +1643,7 @@ void Spell::EffectDummy(uint32 i)
                 return;
             }
             break;
+
         case SPELLFAMILY_DRUID:
             // Starfall
             if (m_spellInfo->SpellFamilyFlags[2] & SPELLFAMILYFLAG2_DRUID_STARFALL)
