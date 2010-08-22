@@ -2714,6 +2714,29 @@ void Spell::SpellDamageHeal(uint32 /*i*/)
             unitTarget->RemoveAura(48920);
 
         m_damage -= addhealth;
+		// Remove Glacial Strike if fully healed | hackfix
+        if ((unitTarget->HasAura(71317) ||
+             unitTarget->HasAura(71316) ||
+             unitTarget->HasAura(70292) ||
+            )&& (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
+            {
+            unitTarget->RemoveAura(71317);
+            unitTarget->RemoveAura(71316);
+            unitTarget->RemoveAura(70292);
+            }
+
+		// Remove Infest at 90% health | hackfix
+        if ((unitTarget->HasAura(70541) ||
+             unitTarget->HasAura(73781) ||
+             unitTarget->HasAura(73780) ||
+             unitTarget->HasAura(73779)
+            )&& (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()* 0.9))
+		{
+			unitTarget->RemoveAura(70541);
+			unitTarget->RemoveAura(73779);
+			unitTarget->RemoveAura(73780);
+			unitTarget->RemoveAura(73781);
+		}
     }
 }
 
