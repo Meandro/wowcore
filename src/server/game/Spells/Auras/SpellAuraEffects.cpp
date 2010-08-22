@@ -4061,12 +4061,16 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const * aurApp, uint8 
 /*********************************************************/
 /***                  MODIFY SPEED                     ***/
 /*********************************************************/
-void AuraEffect::HandleAuraModIncreaseSpeed(AuraApplication const * aurApp, uint8 mode, bool /*apply*/) const
+void AuraEffect::HandleAuraModIncreaseSpeed(AuraApplication const * aurApp, uint8 mode, bool apply) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK))
         return;
 
     Unit * target = aurApp->GetTarget();
+
+	//Spirit walk removes imparing effects
+    if (apply && GetSpellProto()->Id == 58875)
+        target->CastSpell(target, 58876, true);
 
     target->UpdateSpeed(MOVE_RUN, true);
 }
@@ -4174,7 +4178,7 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const * aurApp, uint
     std::list <AuraType> immunity_list;
     if (GetMiscValue() & (1<<10))
         immunity_list.push_back(SPELL_AURA_MOD_STUN);
-    if (GetMiscValue() & (1<<7))
+    if ((GetMiscValue() & (1<<7)) && !(apply && GetId() == 46924))
         immunity_list.push_back(SPELL_AURA_MOD_DISARM);
     if (GetMiscValue() & (1<<1))
         immunity_list.push_back(SPELL_AURA_TRANSFORM);
