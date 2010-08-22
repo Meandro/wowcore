@@ -888,9 +888,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     //health, mana, armor and resistance
 	PetLevelInfo const* pInfo;
  	    if (petType == HUNTER_PET)
- 	        pInfo = objmgr.GetPetLevelInfo(1, petlevel);
+ 	        pInfo = sObjectMgr.GetPetLevelInfo(1, petlevel);
  	    else
- 	        pInfo = objmgr.GetPetLevelInfo(creature_ID, petlevel);
+ 	        pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
     if (pInfo)                                      // exist in DB
     {
         SetCreateHealth(pInfo->health);
