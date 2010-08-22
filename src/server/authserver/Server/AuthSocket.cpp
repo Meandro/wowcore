@@ -406,6 +406,8 @@ bool AuthSocket::_HandleLogonChallenge()
             {
                 //set expired bans to inactive
                 LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+                //update premium accounts period
+				LoginDatabase.Execute("UPDATE account_premium SET active = 0 WHERE unsetdate<=UNIX_TIMESTAMP() AND unsetdate<>setdate");
                 ///- If the account is banned, reject the logon attempt
                 QueryResult_AutoPtr banresult = LoginDatabase.PQuery("SELECT bandate,unbandate FROM account_banned WHERE id = %u AND active = 1", (*result)[1].GetUInt32());
                 if (banresult)

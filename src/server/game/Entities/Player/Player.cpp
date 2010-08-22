@@ -5678,6 +5678,9 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             uint32 craft_skill_gain = sWorld.getConfig(CONFIG_SKILL_GAIN_CRAFTING);
 
+			if (GetSession()->IsPremium())
+			craft_skill_gain *= sWorld.getRate(RATE_XP_EXPLORE_PREMIUM);
+
             return UpdateSkillPro(_spell_idx->second->skillId, SkillGainChance(SkillValue,
                 _spell_idx->second->max_value,
                 (_spell_idx->second->max_value + _spell_idx->second->min_value)/2,
@@ -5693,6 +5696,9 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     sLog.outDebug("UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)", SkillId, SkillValue, RedLevel);
 
     uint32 gathering_skill_gain = sWorld.getConfig(CONFIG_SKILL_GAIN_GATHERING);
+
+	if (GetSession()->IsPremium())
+		gathering_skill_gain *= sWorld.getRate(RATE_XP_EXPLORE_PREMIUM);
 
     // For skinning and Mining chance decrease with level. 1-74 - no decrease, 75-149 - 2 times, 225-299 - 8 times
     switch (SkillId)
@@ -6454,6 +6460,9 @@ void Player::CheckAreaExploreAndOutdoor()
                 {
                     XP = uint32(sObjectMgr.GetBaseXP(p->area_level)*sWorld.getRate(RATE_XP_EXPLORE));
                 }
+
+                if(GetSession()->IsPremium())
+                XP *= sWorld.getRate(RATE_XP_EXPLORE_PREMIUM);
 
                 GiveXP(XP, NULL);
                 SendExplorationExperience(area,XP);
@@ -14399,11 +14408,18 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, Object* questGiver,
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
         XP = uint32(XP*(1.0f + (*i)->GetAmount() / 100.0f));
 
+	if (GetSession()->IsPremium())
+        XP *= sWorld.getRate(RATE_XP_QUEST_PREMIUM);
+
     if (getLevel() < sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
         GiveXP(XP, NULL);
     else
     {
         uint32 money = uint32(pQuest->GetRewMoneyMaxLevel() * sWorld.getRate(RATE_DROP_MONEY));
+
+		if (GetSession()->IsPremium())
+			money *= sWorld.getRate(RATE_XP_EXPLORE_PREMIUM);
+
         ModifyMoney(money);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD, money);
     }
@@ -21824,6 +21840,9 @@ bool Player::RewardPlayerAndGroupAtKill(Unit* pVictim)
             Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_PCT);
             for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
                 xp = uint32(xp*(1.0f + (*i)->GetAmount() / 100.0f));
+
+            if (GetSession()->IsPremium())
+ 	        XP *= sWorld.getRate(RATE_XP_QUEST_PREMIUM);
 
             GiveXP(xp, pVictim);
 

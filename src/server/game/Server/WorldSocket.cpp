@@ -781,6 +781,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     //uint8 expansion = 0;
     LocaleConstant locale;
     std::string account;
+	bool isPremium = false;
     SHA1Hash sha1;
     BigNumber v, s, g, N;
     WorldPacket packet, SendAddonPacked;
@@ -936,6 +937,17 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
         return -1;
     }
 
+ 	    QueryResult_AutoPtr premresult =
+ 	        LoginDatabase.PQuery ("SELECT 1 "
+ 	                                "FROM account_premium "
+ 	                                "WHERE id = '%u' "
+ 	                                "AND active = 1",
+ 	                                id);
+ 	    if (premresult) // if account premium
+ 	    {
+ 	        isPremium = true;
+ 	    }
+
     // Check locked state for server
     sWorld.UpdateAllowedSecurity();
     AccountTypes allowedAccountType = sWorld.GetPlayerSecurityLimit();
@@ -992,7 +1004,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
                             safe_account.c_str());
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
-    ACE_NEW_RETURN (m_Session, WorldSession (id, this, AccountTypes(security), expansion, mutetime, locale, recruiter), -1);
+    ACE_NEW_RETURN (m_Session, WorldSession (id, this, AccountTypes(security), isPremium, expansion, mutetime, locale, recruiter), -1);
 
     m_Crypt.Init(&K);
 

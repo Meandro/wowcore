@@ -182,8 +182,10 @@ namespace Trinity
                 }
             }
 
-            gain *= sWorld.getRate(RATE_XP_KILL);
-            sScriptMgr.OnGainCalculation(gain, pl, u);
+ 		    float premium_rate = pl->GetSession()->IsPremium() ? sWorld.getRate(RATE_XP_KILL_PREMIUM) : 1.0f;
+            gain *= sWorld.getRate(RATE_XP_KILL)*premium_rate;
+
+			sScriptMgr.OnGainCalculation(gain, pl, u);
             return gain;
         }
 
