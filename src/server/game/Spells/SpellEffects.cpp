@@ -1321,7 +1321,11 @@ void Spell::EffectDummy(uint32 i)
                     m_caster->DealDamage(unitTarget, unitTarget->GetMaxHealth()*0.93f);
                     return;
                 }
-                case 49357:                                 // Brewfest Mount Transformation
+                // Magic Pull
+                case 51336:
+                    m_caster->CastSpell(unitTarget,50770,true);
+                    break;
+				case 49357:                                 // Brewfest Mount Transformation
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
                     if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
