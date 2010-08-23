@@ -617,10 +617,11 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                     }
                 }
                 break;
-            }
-                // Improved Devouring Plague should not get any bonus
+                        // Improved Devouring Plague should not get any bonus
 				else if (m_spellInfo->Id == 63675)
 					apply_direct_bonus = false;
+}
+    
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
@@ -2717,7 +2718,7 @@ void Spell::SpellDamageHeal(uint32 /*i*/)
 		// Remove Glacial Strike if fully healed | hackfix
         if ((unitTarget->HasAura(71317) ||
              unitTarget->HasAura(71316) ||
-             unitTarget->HasAura(70292) ||
+             unitTarget->HasAura(70292) 
             )&& (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
             {
             unitTarget->RemoveAura(71317);
@@ -5144,134 +5145,7 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                     }
                     return;
                 }
-                case 72286:                                     // Invincible
-                {
-                if (!unitTarget)
-                        return;
-
-                // Prevent Client Crash 132 with double mount
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-                    switch(unitTarget->ToPlayer()->GetBaseSkillValue(762))
-                    {
-                        case 75: unitTarget->CastSpell(unitTarget, 72281, true); break;
-                        case 150: unitTarget->CastSpell(unitTarget, 72282, true); break;
-                        case 225:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 72283, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 72281, true);
-                            break;
-                        case 300:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 72284, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 72282, true);
-                            break;
-                        default: break;
-                    }
-                    break;
-                }
-                case 75614:                                     // Celestial Steed
-                {
-                if (!unitTarget)
-                        return;
-
-                // Prevent Client Crash 132 with double mount
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-                    switch(unitTarget->ToPlayer()->GetBaseSkillValue(762))
-                    {
-                        case 75: unitTarget->CastSpell(unitTarget, 75619, true); break;
-                        case 150: unitTarget->CastSpell(unitTarget, 75620, true); break;
-                        case 225:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 75617, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 75619, true);
-                            break;
-                        case 300:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 75618, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 75620, true);
-                            break;
-                        default: break;
-                    }
-                    break;
-                }
-                case 71342:                                     // Big Love Rocket
-                {
-                if (!unitTarget)
-                        return;
-
-                // Prevent Client Crash 132 with double mount
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-                    switch(unitTarget->ToPlayer()->GetBaseSkillValue(762))
-                    {
-                        case 75: unitTarget->CastSpell(unitTarget, 71344, true); break;
-                        case 150: unitTarget->CastSpell(unitTarget, 71345, true); break;
-                        case 225:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 71346, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 71344, true);
-                            break;
-                        case 300:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 71347, true);
-                            else
-                                unitTarget->CastSpell(unitTarget, 71345, true);
-                            break;
-                        default: break;
-                    }
-                    break;
-                }
-                case 75973:                                     // X-53 Touring Rocket
-                {
-                if (!unitTarget)
-                        return;
-
-                // Prevent Client Crash 132 with double mount
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-                    switch(unitTarget->ToPlayer()->GetBaseSkillValue(762))
-                    {
-                        case 225:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 75957, true);
-                            break;
-                        case 300:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 76154, true);
-                            break;
-                        default: break;
-                    }
-                    break;
-                }
-                case 74856:                                     // Blazing Hippogryph
-                {
-                if (!unitTarget)
-                       return;
-
-                // Prevent Client Crash 132 with double mount
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-                    switch(unitTarget->ToPlayer()->GetBaseSkillValue(762))
-                    {
-                        case 225:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 74854, true);
-                            break;
-                        case 300:
-                            if (unitTarget->ToPlayer()->GetMapId() == 571 || unitTarget->ToPlayer()->GetMapId() == 530)
-                                unitTarget->CastSpell(unitTarget, 74855, true);
-                            break;
-                        default: break;
-                    }
-                    break;
-                }
+                
 				case 47977:                                     // Magic Broom
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
