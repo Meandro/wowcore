@@ -745,6 +745,10 @@ void Spell::SpellDamageSchoolDmg(uint32 effect_idx)
                         }
                     }
                 }
+// Glyph of Steady Shot
+                    if (AuraEffect const * aurEff = m_caster->GetAuraEffect(56826, 0))
+                        if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_HUNTER, 0x4000, 0, 0))
+                            damage *= (100.0f + aurEff->GetAmount()) / 100.0f;
                 break;
             }
             case SPELLFAMILY_PALADIN:
