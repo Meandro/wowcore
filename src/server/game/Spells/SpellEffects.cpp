@@ -5852,11 +5852,6 @@ void Spell::EffectScriptEffect(uint32 effIndex)
                 {
                     switch (iter->first)
                     {
-                        // Item - Paladin T10 Holy 2P Bonus
-                        case 70755:
-                        if(procSpell->Id == 31842)
-                        triggered_spell_id = 71166;
-                            break;
                         // Heart of the Crusader
                         case 20335: // Rank 1
                             spellId3 = 21183;
