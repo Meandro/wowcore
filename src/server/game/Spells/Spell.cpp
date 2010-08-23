@@ -5728,7 +5728,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
-            case SPELL_AURA_RANGED_AP_ATTACKER_CREATURES_BONUS:
+            case SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE:
             {
                 if (!m_targets.getUnitTarget() && m_targets.getUnitTarget()->GetTypeId() != TYPEID_UNIT)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
